@@ -15,12 +15,12 @@
  */
 BITMAPINFOHEADER createBitmapHeader(int width, int height)
 {
-	BITMAPINFOHEADER  bi;
+	BITMAPINFOHEADER bi;
 
 	// create a bitmap
 	bi.biSize = sizeof(BITMAPINFOHEADER);
 	bi.biWidth = width;
-	bi.biHeight = -height;  //this is the line that makes it draw upside down or not
+	bi.biHeight = -height; //this is the line that makes it draw upside down or not
 	bi.biPlanes = 1;
 	bi.biBitCount = 32;
 	bi.biCompression = BI_RGB;
@@ -41,7 +41,7 @@ BITMAPINFOHEADER createBitmapHeader(int width, int height)
  * @return Mat (Mat of the captured image)
  */
 using cv::Mat;
-Mat captureScreenMat(HWND hwnd)
+Mat captureScreenMat(HWND hwnd, int offsetX = 0, int offsetY = 0, int cropWidth = -1, int cropHeight = -1)
 {
 	Mat src;
 
@@ -51,13 +51,20 @@ Mat captureScreenMat(HWND hwnd)
 	SetStretchBltMode(hwindowCompatibleDC, COLORONCOLOR);
 
 	// define x,y,height and width
-    RECT r;
-    GetWindowRect(hwnd,&r);
-	int screenx = r.left;//GetSystemMetrics(SM_XVIRTUALSCREEN);
-	int screeny = r.top;//GetSystemMetrics(SM_YVIRTUALSCREEN);
-	int width = r.right-r.left;//GetSystemMetrics(SM_CXVIRTUALSCREEN);
-	int height = r.bottom-r.top;//GetSystemMetrics(SM_CYVIRTUALSCREEN);
-
+	RECT r;
+	GetWindowRect(hwnd, &r);	   //passes window handle and pointer to r, and this function modifies r.
+	int screenx = r.left+offsetX;		   //GetSystemMetrics(SM_XVIRTUALSCREEN);
+	int screeny = r.top+offsetY;		   //GetSystemMetrics(SM_YVIRTUALSCREEN);
+	int width;  //GetSystemMetrics(SM_CXVIRTUALSCREEN);
+	if(cropWidth==-1)
+		width = r.right - r.left;  
+	else
+		width = cropWidth;
+	int height;
+	if(cropHeight==-1)
+		height = r.bottom - r.top; //GetSystemMetrics(SM_CYVIRTUALSCREEN);
+	else
+		height=cropHeight;
 	// create mat object
 	src.create(height, width, CV_8UC4);
 
@@ -69,12 +76,12 @@ Mat captureScreenMat(HWND hwnd)
 	SelectObject(hwindowCompatibleDC, hbwindow);
 
 	// copy from the window device context to the bitmap device context
-    //This is what the problem was. stretchblt was producing a completely black image so I replaced it with bitblt and now it works
+	//This is what the problem was. stretchblt was producing a completely black image so I replaced it with bitblt and now it works
 	//StretchBlt(hwindowCompatibleDC, 0, 0, width, height, hwindowDC, screenx, screeny, width, height, SRCCOPY);  //change SRCCOPY to NOTSRCCOPY for wacky colors !
 	BitBlt(hwindowCompatibleDC, 0, 0, width, height, GetDC(0), screenx, screeny, SRCCOPY);
 
-    //this line is what copies the hbitmap image information to the opencv matrix object
-    GetDIBits(hwindowCompatibleDC, hbwindow, 0, height, src.data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);            //copy from hwindowCompatibleDC to hbwindow
+	//this line is what copies the hbitmap image information to the opencv matrix object
+	GetDIBits(hwindowCompatibleDC, hbwindow, 0, height, src.data, (BITMAPINFO *)&bi, DIB_RGB_COLORS); //copy from hwindowCompatibleDC to hbwindow
 
 	// avoid memory leak
 	DeleteObject(hbwindow);
