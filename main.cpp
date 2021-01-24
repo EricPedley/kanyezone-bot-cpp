@@ -5,6 +5,7 @@
 #include "screencap.cpp"
 #include "movementMath.cpp"
 #include "intersectionMath.cpp"
+#include "keyInput.cpp"
 
 cv::Point findImageCenter(cv::Mat img, cv::Mat targetImage) {//img is the larger image and targetImage is what you want to find within img.
     cv::Size targetSize = targetImage.size();
@@ -20,11 +21,11 @@ cv::Point findImageCenter(cv::Mat img, cv::Mat targetImage) {//img is the larger
 }
 
 int main() {//you need to start the program when the zone is just created, so it looks exactly like zone.png
+    std::cout<<"starting program"<<std::endl;
     cv::Mat zonePic = cv::imread("zone.png");//87x87 image
     cv::Mat kanyePic = cv::imread("kanye.png");
 
     HWND chromeWindow = FindWindow(NULL,"Don't let Kanye into his zone: Kanye Zone - Google Chrome");
-
     cv::Mat screenshot1 = captureScreenMat(chromeWindow);
     cv::cvtColor(screenshot1,screenshot1,cv::COLOR_BGRA2BGR);//drops the alpha channel. it's cvtcolor instead of reshape(3) because reshape doesn't drop the alpha, it just rearranges the matrix. https://docs.opencv.org/4.1.1/d8/d01/group__imgproc__color__conversions.html
    
@@ -45,8 +46,31 @@ int main() {//you need to start the program when the zone is just created, so it
         cv::Point delta = kanyeLocation-previousKanyeLocation;//delta is the change in position
         
         cv::Point intersection = getIntersection(delta,kanyeLocation);
-        if(intersection!=cv::Point(-1,-1))
+        if(intersection!=cv::Point(-1,-1)) {
             cv::circle(screenshot,intersection,10,cv::Scalar(0,255,0));//draw green dot at intersection point
+
+            //Something below this comment in this if block is causing a segmentation fault. it happens in a vector so its probably related to movementdecision.
+            cv::Point paddleLocation = findImageCenter(screenshot,cv::imread("paddle.png"));
+            cv::circle(screenshot,paddleLocation,20,cv::Scalar(0,0,255));
+            bool *movementDecision = getMovementDecision(paddleLocation,intersection);
+            bool doMoveCounterClockwise = movementDecision[0];//caused segmentation fault when I was using vectors instead of arrays.
+            bool doPressSpace = movementDecision[1];
+            std::cout <<"decision: "<<doMoveCounterClockwise<< ","<<doPressSpace<<"\n";
+            if(doPressSpace) {
+                tapKey(' ');
+            }
+            if(doMoveCounterClockwise) {
+                //release D and press A
+                releaseKey('d');
+                pressKey('a');
+            } else {
+                //release A and press D
+                releaseKey('a');
+                pressKey('d');
+            }
+            delete[] movementDecision;
+        }
+            
 
         cv::imshow("screen capture",screenshot);
 

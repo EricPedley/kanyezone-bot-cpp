@@ -61,9 +61,7 @@ Point getLineCircleIntersection(Point delta, Point center, int radius=39) {//del
 
 Point getIntersection(Point delta, Point center, int radius=39, int numBounces=3) {//center is the center of kanye's head
     for(int i=0;i<numBounces;i++) {
-        std::cout<<i<<" index for center "<<center<<std::endl;
         Point intersection = getLineCircleIntersection(delta,center,radius);
-        std::cout<<i<<" for intersection at " << intersection << "for center " << center <<std::endl;
         if(intersection!=Point(-1,-1)) {//this means there's an intersection. I programmed getLineCircleIntersection to return (-1,-1) if there was no intersection.
             if( (intersection.x>center.x) == (delta.x>0) )//if the intersection is on the same side of kanye's head as the direction it's travelling. i.e. the intersection is to the left of Kanye and he is going left, or the intersection is on the right and he is going right. 
                 return intersection;
