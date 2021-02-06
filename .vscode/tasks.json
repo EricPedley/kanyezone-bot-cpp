@@ -1,4 +1,5 @@
 {  
+    //https://answers.opencv.org/question/228737/gcc-error-long-no-such-file-or-directory/ is for when building opencv sources with cmake for mingw fails.
   // See https://go.microsoft.com/fwlink/?LinkId=733558 
     // for the documentation about the tasks.json format
     "version": "2.0.0",
@@ -12,22 +13,24 @@
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "-I","C:\\Program Files\\opencv\\OpenCV-MinGW-Build-OpenCV-4.1.1-x64\\include",
-                "-L","C:\\Program Files\\opencv\\OpenCV-MinGW-Build-OpenCV-4.1.1-x64\\x64\\mingw\\bin",              
-                //"-llibopencv_callib3d411",
-                "-llibopencv_core411",
-                "-llibopencv_dnn411",
-                "-llibopencv_features2d411",
-                "-llibopencv_flann411",
-                "-llibopencv_highgui411",
-                "-llibopencv_imgcodecs411",
-                "-llibopencv_imgproc411",
-                "-llibopencv_ml411",
-                "-llibopencv_objdetect411",
-                "-llibopencv_photo411",
-                "-llibopencv_stitching411",
-                "-llibopencv_video411",
-                "-llibopencv_videoio411",
+                //C:\Program Files\opencv\OpenCV-MinGW-Build-OpenCV-4.5.0-with-contrib\include
+                "-I","C:\\Program Files\\opencv\\opencv-4.5.1\\mingw build\\install\\include",
+                //C:\Program Files\opencv\OpenCV-MinGW-Build-OpenCV-4.5.0-with-contrib\x64\mingw\bin
+                "-L","C:\\Program Files\\opencv\\opencv-4.5.1\\mingw build\\install\\x64\\mingw\\bin",//error code 0xC0000135 reference. TLDR is that you need to add this to PATH. https://stackoverflow.com/questions/62029648/process-finished-with-exit-code-1073741515-0xc0000135-after-trying-to-open-pr           
+                //"-llibopencv_callib3d451",
+                "-llibopencv_core451",
+                "-llibopencv_dnn451",
+                "-llibopencv_features2d451",
+                "-llibopencv_flann451",
+                "-llibopencv_highgui451",
+                "-llibopencv_imgcodecs451",
+                "-llibopencv_imgproc451",
+                "-llibopencv_ml451",
+                "-llibopencv_objdetect451",
+                "-llibopencv_photo451",
+                "-llibopencv_stitching451",
+                "-llibopencv_video451",
+                "-llibopencv_videoio451",
                 "-lgdi32"//this is for the screen capture
             ],
             "options": {

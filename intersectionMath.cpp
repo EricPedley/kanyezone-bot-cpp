@@ -1,13 +1,31 @@
-#ifndef cv
+#pragma once
 #include <opencv2/opencv.hpp>
-#endif
 
 using cv::Point;
 
-Point getLineCircleIntersection(Point delta, Point center, int radius=39) {//delta is a vector not a point but I'm using the point object to store its x and y components
+class IntersectionCalculator {
+    float scaleFactor;
+    public:
+        IntersectionCalculator(float);
+        IntersectionCalculator();
+        Point getIntersection(Point,Point,int,int);
+    private:
+        Point getLineCircleIntersection(Point,Point,int);
+};
+
+IntersectionCalculator::IntersectionCalculator(float scaleFac) {
+    std::cout<<"scale factor is: "<<scaleFac<<std::endl;
+    scaleFactor=scaleFac;
+}
+
+IntersectionCalculator::IntersectionCalculator() {
+    IntersectionCalculator(1);
+}
+
+Point IntersectionCalculator::getLineCircleIntersection(Point delta, Point center, int radius=39) {//delta is a vector not a point but I'm using the point object to store its x and y components
     
-    int c = 465/2;//x coordinate of center of circle
-    int d = 466/2;// y coordinate of center of circle
+    int c = scaleFactor*465/2;//x coordinate of center of circle
+    int d = scaleFactor*466/2;// y coordinate of center of circle
     int e = radius;//radius of circle
     if(delta.x==0) {
         int cSquared = pow(center.x-c,2);//this represents the (x-c)^2 term 
@@ -59,21 +77,21 @@ Point getLineCircleIntersection(Point delta, Point center, int radius=39) {//del
     }
 }
 
-Point getIntersection(Point delta, Point center, int radius=39, int numBounces=3) {//center is the center of kanye's head
+Point IntersectionCalculator::getIntersection(Point delta, Point center, int radius=39, int numBounces=3) {//center is the center of kanye's head
     for(int i=0;i<numBounces;i++) {
         Point intersection = getLineCircleIntersection(delta,center,radius);
         if(intersection!=Point(-1,-1)) {//this means there's an intersection. I programmed getLineCircleIntersection to return (-1,-1) if there was no intersection.
             if( (intersection.x>center.x) == (delta.x>0) )//if the intersection is on the same side of kanye's head as the direction it's travelling. i.e. the intersection is to the left of Kanye and he is going left, or the intersection is on the right and he is going right. 
                 return intersection;
-            else
+            else//this should be impossible because it means, for example, there is an intersection to the left of Kanye but he is travelling left.
                 std::cout << "i don't know what would trigger this to be run." <<std::endl;
         } else {
             if(delta.x==0) {//if travelling vertically, the next point is the top or bottom depending on delta.y
                 if(delta.y<0) {
-                    center = Point(center.x,466-76/2);
+                    center = Point(center.x,scaleFactor*466-scaleFactor*76/2);
                     delta.y=-delta.y;
                 } else {
-                    center = Point(center.x,76/2);
+                    center = Point(center.x,scaleFactor*76/2);
                     delta.y=-delta.y;
                 }
                 continue;
@@ -81,26 +99,28 @@ Point getIntersection(Point delta, Point center, int radius=39, int numBounces=3
             double slope = delta.y/delta.x;
             int yIntercept;
             if(delta.x>0)//both of these calculate yIntercept using the equation of Kanye's motion in point-slope form rearranged to solve for the y intercept.
-                yIntercept=slope*(465-56/2-center.x)+center.y;//56 is the width in pixels of Kanye's head.
+                yIntercept=slope*(scaleFactor*465-scaleFactor*56/2-center.x)+center.y;//scaleFactor*56 is the width in pixels of Kanye's head.
             else
-                yIntercept = slope*(56/2-center.x)+center.y;
-            if(yIntercept>466-76/2) {//76 is the height of kanye's head. this condition checks if we are gonna intersect the bottom of the map.
+                yIntercept = slope*(scaleFactor*56/2-center.x)+center.y;
+            if(yIntercept>scaleFactor*466-scaleFactor*76/2) {//scaleFactor*76 is the height of kanye's head. this condition checks if we are gonna intersect the bottom of the map.
                 delta.y=-delta.y;//reflect velocity over x axis
                 if(slope!=0)//don't know why slope ever hits zero.
-                    center = Point(center.x+(466-76/2-center.y)/slope,466-76/2);
+                    center = Point(center.x+(scaleFactor*466-scaleFactor*76/2-center.y)/slope,scaleFactor*466-scaleFactor*76/2);
                 else
                     std::cout << "I don't know why, but the slope of the velocity of Kanye's head is zero." <<std::endl;
-            } else if(yIntercept<76/2) {//intersection with the top of the map
+            } else if(yIntercept<scaleFactor*76/2) {//intersection with the top of the map
                 delta.y=-delta.y;
                 if(slope!=0)//don't know why slope ever hits zero. this is almost the same logic as in the case where we intersect the top, except the y coord is different
-                    center = Point(center.x+(76/2-center.y)/slope,76/2);
+                    center = Point(center.x+(scaleFactor*76/2-center.y)/slope,scaleFactor*76/2);
                 else
                     std::cout << "I don't know why, but the slope of the velocity of Kanye's head is zero."<<std::endl;
             } else {//bouncing off side wall
                 delta.x=-delta.x;
-                center = Point((delta.x<0)? 56/2:565-56/2,yIntercept);
+                center = Point((delta.x<0)? scaleFactor*56/2:scaleFactor*565-scaleFactor*56/2,yIntercept);
             }
         }
     }
     return Point(-1,-1);
 }
+
+
