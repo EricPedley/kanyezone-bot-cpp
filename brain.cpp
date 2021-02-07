@@ -13,9 +13,10 @@ using cv::Point;
 class Brain {
     Mat kanyePic, zonePic, paddlePic;
     float scaleFactor;
-    int zoneRadius;//,warpCooldown;
-    Point previousKanyeLocation,canvasCenter,latestIntersection;
+    int zoneRadius,warpPreventionCounter,warpCooldown;
+    Point previousKanyeLocation,canvasCenter,latestIntersection,previousPaddlePosition;
     IntersectionCalculator calc;
+    bool previouslyWarped;
     public:
         Brain(Mat,Mat,Mat,float);
         bool* getMovementDecision(Mat);//get movement decision based on current game screenshot
@@ -39,11 +40,17 @@ Brain::Brain(Mat kanye, Mat zone, Mat paddle, float scaleFac=1) {//when scalefac
     calc=IntersectionCalculator(scaleFac);
     canvasCenter = Point(int(scaleFactor*465/2),int(scaleFactor*466/2));//TODO figure out if you actually need to cast to integer here (probably not, at least in this function)
     latestIntersection=Point(-1,-1);
-    //warpCooldown=0;
+    previouslyWarped=false;
+    warpCooldown=0;
+    warpPreventionCounter=0;
 }
 
 Point rotatedPoint(Point v, double theta) {
     return Point(cos(theta)*v.x-sin(theta)*v.y,sin(theta)*v.x+cos(theta)*v.y);
+}
+
+double distSq(Point a, Point b) {
+    return pow(a.x-b.x,2)+pow(a.y-b.y,2);
 }
 
 bool* Brain::getMovementDecision(Point paddleLocation, Point targetLocation) {
@@ -64,7 +71,6 @@ bool* Brain::getMovementDecision(Point paddleLocation, Point targetLocation) {
 
 
 bool* Brain::getMovementDecision(Mat screenshot) {
-    //warpCooldown++;
     cv::Size scaledSize = cv::Size(int(screenshot.size().width*scaleFactor),int(screenshot.size().height*scaleFactor));
     cv::resize(screenshot,screenshot,scaledSize);
 
@@ -100,35 +106,45 @@ bool* Brain::getMovementDecision(Mat screenshot) {
         //     wacky = true;
         // }
     }
-    int cropDiameter = 2*(42+30+zoneRadius);
+    float cropDiameter = 2*(42+30+zoneRadius/scaleFactor);
     Point cropStart = Point(int((465-cropDiameter)*scaleFactor/2),int((466-cropDiameter)*scaleFactor/2));
     Point bottomRight = cropStart+Point(int(cropDiameter*scaleFactor),int(cropDiameter*scaleFactor));
     cv::Rect croppedRegion(cropStart,bottomRight);//140(above 87+42)px square region centered at the game center
     Mat croppedScreenshot = screenshot(croppedRegion);
     Point paddleLocation = cropStart+findImageCenter(croppedScreenshot,paddlePic);
     decision = getMovementDecision(paddleLocation,latestIntersection);
-
-    // Point relativePaddleLocation = paddleLocation-canvasCenter;
-    // Point relativeTargetLocation = latestIntersection-canvasCenter;
-    // Point ccwReferencePoint = rotatedPoint(relativeTargetLocation,PI/2);
-
-    // if(warpCooldown>100) {//if jumping
-    //     warpCooldown=0;
-    // } else {
-    //     if(decision[1]) {
-    //         std::cout<<"trying to warp but on cooldown"<<std::endl;
-    //         decision[0]=!decision[0];
-    //     }
+    // if(warpCooldown>0) {//if on cooldown
     //     decision[1]=false;
+    //     warpCooldown++;//increment cooldown
+    //     if(warpCooldown>10) {//if done, take it off cooldown
+    //         warpCooldown=0;
+    //     }
     // }
+    // if(decision[1]&&warpCooldown==0) {//if not on cooldown and we warp, put it on cooldown. 
+    //     warpCooldown=1;
+    // }
+    double paddleDistance = distSq(paddleLocation,previousPaddlePosition);
+    bool originalWarpDecision=decision[1];
+    //we only prevent a warp 10 times in a row, then let it go.
+    if(previouslyWarped && warpPreventionCounter<15 && paddleDistance<pow(2*zoneRadius,2)) {//if we supposedly warped but the paddle hasn't moved yet
+        std::cout<<"preventing double warp"<<std::endl;
+        decision[1]=false;
+        warpPreventionCounter++;
+    }
+    previouslyWarped=originalWarpDecision;
+    previousPaddlePosition = paddleLocation;
     if(decision[1]) {
+        if(warpPreventionCounter>=15)
+            std::cout<<"overrided warp prevention"<<std::endl;
+        warpPreventionCounter=0;
+        std::cout<<"paddle distance: "<<paddleDistance<<std::endl;
         cv::circle(screenshot,cv::Point(20,20),8,cv::Scalar(255,255,255),-1);
     }
     cv::rectangle(screenshot,croppedRegion,cv::Scalar(255,255,255));//white rectangle around crop region for paddle
     cv::rectangle(screenshot,cv::Rect(kanyeLocation-kanyeSize/2,kanyeLocation+kanyeSize/2),cv::Scalar(255,255,0));//draw cyan rectangle around kanye
     cv::circle(screenshot,paddleLocation,int(20*scaleFactor),cv::Scalar(0,0,255));
-    //cv::circle(screenshot,canvasCenter+ccwReferencePoint,5,cv::Scalar(255,200,0),cv::FILLED);
     cv::circle(screenshot,latestIntersection,5,cv::Scalar(0,255,0),cv::FILLED);//draw green dot at intersection point
+    cv::resize(screenshot,screenshot,cv::Size(465,466));
     cv::imshow("screen capture",screenshot);
     // if(wacky)
     //     cv::imshow("wacky intercept",screenshot);

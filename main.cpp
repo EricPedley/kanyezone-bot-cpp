@@ -32,7 +32,7 @@ int main() {//you need to start the program when the zone is just created, so it
 
 
     //set up scale factor
-    float scaleFactor=0.5;//TODO mess with scale factor to get best speed with acceptable accuracy loss
+    float scaleFactor=0.25;//TODO mess with scale factor to get best speed with acceptable accuracy loss
     Brain brain = Brain(kanyePic,zonePic,paddlePic,scaleFactor);
 
     int prev = getTime();
