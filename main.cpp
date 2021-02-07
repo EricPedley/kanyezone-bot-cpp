@@ -32,18 +32,20 @@ int main() {//you need to start the program when the zone is just created, so it
 
 
     //set up scale factor
-    float scaleFactor=0.25;//TODO mess with scale factor to get best speed with acceptable accuracy loss
+    float scaleFactor=0.2;//TODO mess with scale factor to get best speed with acceptable accuracy loss
     Brain brain = Brain(kanyePic,zonePic,paddlePic,scaleFactor);
 
     int prev = getTime();
 
     while(1) {
         // int now=getTime();
-        // std::cout<<(now-prev)/1e6f<<std::endl;
+        // std::cout<<float(now-prev)/CLOCKS_PER_SEC<<std::endl;
         // prev=now;
+        int t1 = clock();
         cv::Mat screenshot = captureScreenMat(chromeWindow,origin.x-465/2,origin.y-466/2,465,466);//screenshot is cropped to the game window if you started the program at the right time, when matchtemplate can find zone.png.
+        int t2 = clock();
+        std::cout<<float(t2-t1)/CLOCKS_PER_SEC<<std::endl;
         cv::cvtColor(screenshot,screenshot,cv::COLOR_BGRA2BGR);//drops the alpha channel
-        
         bool *movementDecision = brain.getMovementDecision(screenshot);
         if(movementDecision!=nullptr) {
             if(movementDecision[1]) {
