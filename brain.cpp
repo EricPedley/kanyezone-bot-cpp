@@ -86,7 +86,6 @@ bool* Brain::getMovementDecision(Mat screenshot) {
         else
             break;
     }
-    cv::circle(screenshot,cv::Point(int(scaleFactor*465/2),int(scaleFactor*466/2)),zoneRadius,cv::Scalar(0,255,0),2);
 
     //get location of kanye and his velocity
     Point kanyeLocation = findImageCenter(screenshot,kanyePic);
@@ -97,7 +96,7 @@ bool* Brain::getMovementDecision(Mat screenshot) {
     //draw box around kanye
     Point kanyeSize = Point(int(scaleFactor*56),int(scaleFactor*76));
 
-    Point intersection = calc.getIntersection(delta,kanyeLocation,zoneRadius);//find intersection
+    Point intersection = calc.getIntersection(delta,kanyeLocation,zoneRadius,2);//find intersection
     bool* decision = nullptr;
     //bool wacky = false;
     if(intersection!=Point(-1,-1)) {//if there is an intersection
@@ -113,7 +112,7 @@ bool* Brain::getMovementDecision(Mat screenshot) {
     Point bottomRight = cropStart+Point(int(cropDiameter*scaleFactor),int(cropDiameter*scaleFactor));
     cv::Rect croppedRegion(cropStart,bottomRight);//140(above 87+42)px square region centered at the game center
     Mat croppedScreenshot = screenshot(croppedRegion);
-    Point paddleLocation = cropStart+findImageCenter(croppedScreenshot,paddlePic);
+    Point paddleLocation = cropStart+findImageCenter(croppedScreenshot,paddlePic,zoneRadius);
     decision = getMovementDecision(paddleLocation,latestIntersection);
     // if(warpCooldown>0) {//if on cooldown
     //     decision[1]=false;
@@ -127,8 +126,8 @@ bool* Brain::getMovementDecision(Mat screenshot) {
     // }
     double paddleDistance = distSq(paddleLocation,previousPaddlePosition);
     bool originalWarpDecision=decision[1];
-    //we only prevent a warp 10 times in a row, then let it go.
-    if(previouslyWarped && warpPreventionCounter<5 && paddleDistance<pow(2*zoneRadius,2)) {//if we supposedly warped but the paddle hasn't moved yet
+    //we only prevent a warp a certain amount of times in a row, then let it go.
+    if(previouslyWarped && warpPreventionCounter<3 && paddleDistance<pow(2*zoneRadius,2)) {//if we supposedly warped but the paddle hasn't moved yet
         std::cout<<"preventing double warp"<<std::endl;
         decision[1]=false;
         warpPreventionCounter++;
@@ -136,16 +135,17 @@ bool* Brain::getMovementDecision(Mat screenshot) {
     previouslyWarped=originalWarpDecision;
     previousPaddlePosition = paddleLocation;
     if(decision[1]) {
-        if(warpPreventionCounter>=5)
+        if(warpPreventionCounter>=3)
             std::cout<<"overrided warp prevention"<<std::endl;
         warpPreventionCounter=0;
         std::cout<<"paddle distance: "<<paddleDistance<<std::endl;
         //cv::circle(screenshot,cv::Point(20,20),8,cv::Scalar(255,255,255),-1);
     }
+    //cv::circle(screenshot,cv::Point(int(scaleFactor*465/2),int(scaleFactor*466/2)),zoneRadius,cv::Scalar(0,255,0));
     cv::rectangle(screenshot,croppedRegion,cv::Scalar(255,255,255));//white rectangle around crop region for paddle
     cv::rectangle(screenshot,cv::Rect(kanyeLocation-kanyeSize/2,kanyeLocation+kanyeSize/2),cv::Scalar(255,255,0));//draw cyan rectangle around kanye
     cv::circle(screenshot,paddleLocation,int(20*scaleFactor),cv::Scalar(0,0,255));
-    cv::circle(screenshot,latestIntersection,5,cv::Scalar(0,255,0),cv::FILLED);//draw green dot at intersection point
+    cv::circle(screenshot,latestIntersection,int(20*scaleFactor),cv::Scalar(0,255,0),cv::FILLED);//draw dot at intersection point
     cv::resize(screenshot,screenshot,cv::Size(465,466));
     cv::imshow("screen capture",screenshot);
 
