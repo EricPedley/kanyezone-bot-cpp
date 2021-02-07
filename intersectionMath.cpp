@@ -80,11 +80,8 @@ Point IntersectionCalculator::getLineCircleIntersection(Point delta, Point cente
 Point IntersectionCalculator::getIntersection(Point delta, Point center, int radius=39, int numBounces=3) {//center is the center of kanye's head
     for(int i=0;i<numBounces;i++) {
         Point intersection = getLineCircleIntersection(delta,center,radius);
-        if(intersection!=Point(-1,-1)) {//this means there's an intersection. I programmed getLineCircleIntersection to return (-1,-1) if there was no intersection.
-            if( (intersection.x>center.x) == (delta.x>0) )//if the intersection is on the same side of kanye's head as the direction it's travelling. i.e. the intersection is to the left of Kanye and he is going left, or the intersection is on the right and he is going right. 
-                return intersection;
-            else//this should be impossible because it means, for example, there is an intersection to the left of Kanye but he is travelling left.
-                std::cout << "i don't know what would trigger this to be run." <<std::endl;
+        if(intersection!=Point(-1,-1)&&((intersection.x>center.x) == (delta.x>0))) {//this means there's an intersection. I programmed getLineCircleIntersection to return (-1,-1) if there was no intersection.
+           return intersection;
         } else {
             if(delta.x==0) {//if travelling vertically, the next point is the top or bottom depending on delta.y
                 if(delta.y<0) {
@@ -116,11 +113,9 @@ Point IntersectionCalculator::getIntersection(Point delta, Point center, int rad
                     std::cout << "I don't know why, but the slope of the velocity of Kanye's head is zero."<<std::endl;
             } else {//bouncing off side wall
                 delta.x=-delta.x;
-                center = Point((delta.x<0)? scaleFactor*56/2:scaleFactor*565-scaleFactor*56/2,yIntercept);
+                center = Point((delta.x<0)? scaleFactor*56/2:scaleFactor*465-scaleFactor*56/2,yIntercept);
             }
         }
     }
     return Point(-1,-1);
 }
-
-
