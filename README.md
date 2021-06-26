@@ -2,7 +2,9 @@
 
   [![Demo Video](https://media.giphy.com/media/w3GSrHSP9LepvCtW0G/giphy.gif)](http://www.youtube.com/watch?v=yzOuAT0VVvA)
   
-  I'm rewrote [this Python project](https://github.com/EricPedley/kanyezone-bot) in C++ to try making it lag less and to learn C++
+  I rewrote [this Python project](https://github.com/EricPedley/kanyezone-bot) in C++ to try making it lag less and to learn C++
+
+  Basically how it works is using the windows API to take screenshots and simulate keypresses, uses OpenCV to process the screenshots to find the position of all the game elements on the screen, then does some math to figure out which direction the blue dot should rotate around the center.
 
   The easiest way to set up this project would be this tutorial for setting up opencv on Windows: https://cuda-chen.github.io/programming/image%20processing/2020/01/21/vscode-with-opencv-cpp-on-windows10-explained.html.
   My setup was identical to that tutorial, except that I removed "-llibopencv_callib3d411" from tasks.json because g++ said it couldn't find that library (even though it was in opencv's bin)
