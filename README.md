@@ -2,7 +2,7 @@
 ![project screenshot](https://media.giphy.com/media/w3GSrHSP9LepvCtW0G/giphy.gif)
 <br>[Demo Link](http://www.youtube.com/watch?v=yzOuAT0VVvA)
 ## Description
-  This is a C++ application that uses the windows API to take screenshots and simulate keypresses, uses OpenCV to process the screenshots to find the position of all the game elements on the screen, and then does some math to figure out which direction the blue dot should rotate around the center.
+  This is a C++ application that uses the windows API to take screenshots and simulate keypresses, uses OpenCV to process the screenshots to find the position of all the game elements on the screen, and then does some math to figure out which direction the blue dot should rotate around the center. The game it plays is http://www.kanyezone.com/ and it easily beats any human performance.
 
   I also wrote a previous version of this project in python: https://github.com/EricPedley/kanyezone-bot
   
