@@ -1,4 +1,4 @@
-# Bot for playing Kanye Zone
+# C++ OpenCV Game Bot
 ![project screenshot](https://media.giphy.com/media/w3GSrHSP9LepvCtW0G/giphy.gif)
 <br>[Demo Link](http://www.youtube.com/watch?v=yzOuAT0VVvA)
 ## Description
