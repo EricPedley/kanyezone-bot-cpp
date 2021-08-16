@@ -28,7 +28,7 @@ void releaseKey(char key) {//release key
 }
 
 void tapKey(char key) {//press and release key
-    INPUT Input = { 0 };
+    INPUT Input = {0};
     Input.type = INPUT_KEYBOARD;
     Input.ki.wVk = VkKeyScanA(key);
     SendInput(1, &Input, sizeof(Input));

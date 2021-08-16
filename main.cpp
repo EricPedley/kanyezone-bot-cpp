@@ -3,13 +3,10 @@
 #include <windows.h>
 #include <ctime>
 
-#include "screencap.cpp"
-#include "brain.cpp"
-#include "intersectionMath.cpp"
-#include "keyInput.cpp"
-#ifndef findImageCenter
-#include "templMatching.cpp"
-#endif
+#include "winapi/screenCap.hpp"
+#include "winapi/keyInput.hpp"
+#include "templMatching.hpp"
+#include "brain.hpp"
 
 int getTime() {//returns current time since unix epoch in nanoseconds
     return clock();// this is for include <chrono> std::chrono::system_clock::now().time_since_epoch().count();
@@ -20,9 +17,9 @@ int main() {//you need to start the program when the zone is just created, so it
     std::cout<<"starting program"<<std::endl;
 
     //Initialize image matrices and chrome window handle
-    cv::Mat zonePic = cv::imread("zone.png");//87x87 image
-    cv::Mat kanyePic = cv::imread("kanye.png");
-    cv::Mat paddlePic = cv::imread("paddle.png");
+    cv::Mat zonePic = cv::imread("images/zone.png");//87x87 image
+    cv::Mat kanyePic = cv::imread("images/kanye.png");
+    cv::Mat paddlePic = cv::imread("images/paddle.png");
     HWND chromeWindow = FindWindow(NULL,"Don't let Kanye into his zone: Kanye Zone - Google Chrome");
     //figure out where the game is on the screen and save the center location
     cv::Mat initialCap = ScreenCapturer(chromeWindow).getScreenCap();

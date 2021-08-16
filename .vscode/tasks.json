@@ -10,9 +10,13 @@
             "command": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe",
             "args": [
                 "-g",
-                "${file}",
+                "${workspaceFolder}\\*.cpp",//https://code.visualstudio.com/docs/cpp/config-msvc#_modifying-tasksjson
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                // "-g",
+                // "C:\\Users\\Eric\\Projects\\kanyezone-cpp\\main.cpp",//main file path
+                // "-o",
+                // "C:\\Users\\Eric\\Projects\\kanyezone-cpp\\main.exe",
                 //C:\Program Files\opencv\OpenCV-MinGW-Build-OpenCV-4.5.0-with-contrib\include
                 "-I","C:\\Program Files\\opencv\\opencv-4.5.1\\mingw build\\install\\include",
                 //C:\Program Files\opencv\OpenCV-MinGW-Build-OpenCV-4.5.0-with-contrib\x64\mingw\bin
