@@ -1,5 +1,5 @@
 # C++ OpenCV Game Bot
-![project screenshot](https://media.giphy.com/media/w3GSrHSP9LepvCtW0G/giphy.gif)
+![readme screenshot](https://media.giphy.com/media/w3GSrHSP9LepvCtW0G/giphy.gif)
 <br>[Demo Link](http://www.youtube.com/watch?v=yzOuAT0VVvA)
 ## Description
   This is a C++ application that uses the windows API to take screenshots and simulate keypresses, uses OpenCV to process the screenshots to find the position of all the game elements on the screen, and then does some math to figure out which direction the blue dot should rotate around the center. The game it plays is http://www.kanyezone.com/ and it easily beats any human performance.
@@ -11,3 +11,5 @@
   In the demo video I'm using opencv 4.5.1 built from source.
   
   I'm including my .vscode in this repo because setting up the compiler and dependencies was a headache. If you're cloning this you need to replace the paths to mingw and opencv with the paths on your computer. You can find the downloads for those and setup instructions in the tutorial I linked above.
+
+![project screenshot](https://user-images.githubusercontent.com/48658337/172334402-a3a71312-d680-4cb6-a524-01e88d88e429.gif)
